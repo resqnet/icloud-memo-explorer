@@ -1,0 +1,43 @@
+{
+  "name": "icloud-memo-explorer",
+  "version": "0.1.0",
+  "description": "Export and browse your iCloud Notes as Markdown — one command, no setup.",
+  "type": "module",
+  "bin": {
+    "icloud-memo-explorer": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "icloud",
+    "notes",
+    "apple",
+    "memo",
+    "export",
+    "markdown",
+    "viewer"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "commander": "^12.1.0",
+    "express": "^4.21.0",
+    "marked": "^15.0.0",
+    "open": "^10.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
