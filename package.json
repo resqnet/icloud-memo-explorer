@@ -7,6 +7,7 @@
     "icloud-memo-explorer": "./dist/cli.js"
   },
   "scripts": {
+    "prepare": "tsc",
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/cli.js"
