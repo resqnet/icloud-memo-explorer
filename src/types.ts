@@ -13,12 +13,20 @@ export interface CloudKitField {
   type?: string;
 }
 
+export interface NoteImage {
+  filename: string;
+  url: string;
+  width?: number;
+  height?: number;
+}
+
 export interface Note {
   title: string;
   body: string;
   created: Date;
   modified: Date;
   filename: string;
+  images: NoteImage[];
 }
 
 export interface SessionData {

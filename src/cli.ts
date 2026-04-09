@@ -17,7 +17,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { authenticate } from "./auth.js";
 import { fetchNotes } from "./fetcher.js";
-import { recordsToNotes, exportToMarkdown } from "./exporter.js";
+import { recordsToNotes, exportToMarkdown, downloadImages } from "./exporter.js";
 import { startViewer } from "./viewer.js";
 
 const DEFAULT_OUTPUT = "./icloud-notes";
@@ -49,9 +49,18 @@ async function doFetch(appleId: string, outputDir: string): Promise<string> {
 
   console.log("Decoding and exporting to Markdown...");
   const notes = recordsToNotes(records);
-  const saved = exportToMarkdown(notes, absDir);
+  const { saved, pendingImages } = exportToMarkdown(notes, absDir);
 
   console.log(`\n  ${saved} notes saved to ${absDir}`);
+
+  if (pendingImages.length > 0) {
+    console.log(`Downloading ${pendingImages.length} images...`);
+    const downloaded = await downloadImages(pendingImages, (done, total) => {
+      process.stdout.write(`\r  ${done}/${total} images downloaded...`);
+    });
+    console.log(`\n  ${downloaded} images downloaded to ${absDir}/images`);
+  }
+
   return absDir;
 }
 

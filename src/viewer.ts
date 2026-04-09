@@ -324,6 +324,9 @@ export function startViewer(notesDir: string, port: number = 3000): Promise<void
   const { metas, details } = loadNotes(notesDir);
   const app = express();
 
+  // Serve images as static files so Markdown image references work
+  app.use("/images", express.static(join(notesDir, "images")));
+
   app.get("/", (_req, res) => {
     res.type("html").send(HTML_TEMPLATE);
   });
