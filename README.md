@@ -46,6 +46,10 @@ npm start -- fetch --apple-id you@example.com -o ./my-notes
 Browse previously exported Markdown notes.
 
 ```bash
+# Default: ./icloud-notes
+npm start -- view
+
+# Specify a directory
 npm start -- view ./my-notes
 ```
 
