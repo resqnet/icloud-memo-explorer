@@ -2,3 +2,14 @@ node_modules/
 dist/
 *.tgz
 .DS_Store
+
+# User data
+icloud-notes/
+*.session.json
+*.cookies.json
+.icloud-memo-explorer/
+
+# Environment
+.env
+.env.*
+*.local

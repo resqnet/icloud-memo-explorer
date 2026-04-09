@@ -3,7 +3,7 @@
  * Handles cookies, session tokens, and persistence.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, chmodSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import type { SessionData } from "./types.js";
@@ -66,12 +66,12 @@ export class ICloudSession {
   }
 
   save(): void {
-    writeFileSync(this.sessionPath, JSON.stringify(this.data, null, 2));
+    writeFileSync(this.sessionPath, JSON.stringify(this.data, null, 2), { mode: 0o600 });
     const cookieObj: Record<string, string> = {};
     for (const [k, v] of this.cookies) {
       cookieObj[k] = v;
     }
-    writeFileSync(this.cookiePath, JSON.stringify(cookieObj, null, 2));
+    writeFileSync(this.cookiePath, JSON.stringify(cookieObj, null, 2), { mode: 0o600 });
   }
 
   /** Update session data from response headers. */

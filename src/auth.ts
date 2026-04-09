@@ -40,8 +40,41 @@ async function prompt(message: string): Promise<string> {
 }
 
 async function promptPassword(message: string): Promise<string> {
-  // Simple password input (no echo hiding in basic Node.js)
-  return prompt(message);
+  return new Promise((resolve, reject) => {
+    stdout.write(message);
+    if (stdin.isTTY) stdin.setRawMode(true);
+    stdin.resume();
+    let password = "";
+    const cleanup = () => {
+      if (stdin.isTTY) stdin.setRawMode(false);
+      stdin.removeListener("data", onData);
+      stdin.pause();
+    };
+    const onData = (ch: Buffer) => {
+      const str = ch.toString("utf8");
+      for (const c of str) {
+        if (c === "\n" || c === "\r") {
+          cleanup();
+          stdout.write("\n");
+          resolve(password);
+          return;
+        } else if (c === "\u0003") {
+          cleanup();
+          reject(new Error("User cancelled"));
+          return;
+        } else if (c === "\u007F" || c === "\b") {
+          if (password.length > 0) {
+            password = password.slice(0, -1);
+            stdout.write("\b \b");
+          }
+        } else {
+          password += c;
+          stdout.write("*");
+        }
+      }
+    };
+    stdin.on("data", onData);
+  });
 }
 
 function getAuthHeaders(session: ICloudSession): Record<string, string> {

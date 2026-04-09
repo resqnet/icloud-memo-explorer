@@ -342,7 +342,7 @@ export function startViewer(notesDir: string, port: number = 3000): Promise<void
   });
 
   return new Promise((resolve) => {
-    app.listen(port, () => {
+    app.listen(port, "127.0.0.1", () => {
       console.log(`\n  iCloud Memo Explorer is running!`);
       console.log(`  Open http://localhost:${port} in your browser.\n`);
       console.log(`  Loaded ${metas.length} notes from ${notesDir}`);

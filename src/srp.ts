@@ -118,8 +118,8 @@ export function processChallenge(
 
   const derivedPassword = derivePassword(rawPassword, salt, iterations, 32, protocol);
 
-  // x = H(salt | password) — no username in x (Apple-specific)
-  const x = bufferToBigInt(sha256(Buffer.concat([salt, derivedPassword])));
+  // x = H(salt | H(":" | derivedPassword)) — Apple GSA SRP (no_username_in_x: username is empty, colon remains)
+  const x = bufferToBigInt(sha256(Buffer.concat([salt, sha256(Buffer.concat([Buffer.from(":"), derivedPassword]))])));
 
   const k = computeK();
   const u = computeU(state.A, B);
@@ -135,9 +135,9 @@ export function processChallenge(
 
   const K = sha256(bigIntToBuffer(S));
 
-  // M1 = H(H(N) xor H(g), H(username), salt, A, B, K) — RFC 5054
+  // M1 = H(H(N) xor H(g), H(username), salt, A, B, K) — Apple GSA variant
   const hN = sha256(bigIntToBuffer(N));
-  const hg = sha256(bigIntToBuffer(g));
+  const hg = sha256(padToN(bigIntToBuffer(g)));
   const hNxorHg = Buffer.alloc(hN.length);
   for (let i = 0; i < hN.length; i++) {
     hNxorHg[i] = hN[i]! ^ hg[i]!;
@@ -145,11 +145,11 @@ export function processChallenge(
   const hUser = sha256(Buffer.from(state.username, "utf-8"));
 
   const M1buf = sha256(
-    Buffer.concat([hNxorHg, hUser, salt, padToN(bigIntToBuffer(state.A)), padToN(bigIntToBuffer(B)), K]),
+    Buffer.concat([hNxorHg, hUser, salt, bigIntToBuffer(state.A), bigIntToBuffer(B), K]),
   );
 
   // M2 = H(A, M1, K)
-  const M2buf = sha256(Buffer.concat([padToN(bigIntToBuffer(state.A)), M1buf, K]));
+  const M2buf = sha256(Buffer.concat([bigIntToBuffer(state.A), M1buf, K]));
 
   return {
     M1: M1buf.toString("base64"),
