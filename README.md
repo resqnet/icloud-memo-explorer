@@ -102,6 +102,15 @@ The built-in browser viewer provides:
 - Responsive layout (desktop + mobile)
 - No external dependencies — single HTML page served locally
 
+## Limitations
+
+- **手書きメモ (Handwriting / Sketches)** — Apple Notes の手書き・描画データには対応していません。手書きのみのノートは空の内容で出力されます。
+- **音声メモ (Audio recordings)** — ノートに埋め込まれた音声データはエクスポートされません。
+- **スキャン文書 (Scanned documents)** — スキャナー機能で取り込んだ PDF は対応していません。
+- **表 (Tables)** — Apple Notes のテーブルはプレーンテキストとして出力され、表の構造は保持されません。
+
+画像（写真）の添付ファイルには対応しており、Markdown 内に `![image](./images/...)` として埋め込まれます。
+
 ## Requirements
 
 - **Node.js >= 18**
