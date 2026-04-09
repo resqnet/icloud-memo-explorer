@@ -63,8 +63,7 @@ export function recordsToNotes(records: CloudKitRecord[]): Note[] {
 
     // Filename
     const dateStr = formatDate(date);
-    const safeTitle = (title || "untitled")
-      .replace(/[<>:"/\\|?*]/g, "_")
+    const safeTitle = sanitizeFilename(title || "untitled")
       .slice(0, 100);
     const filename = `${dateStr}_${safeTitle}.md`;
 
@@ -72,6 +71,34 @@ export function recordsToNotes(records: CloudKitRecord[]): Note[] {
   }
 
   return notes;
+}
+
+/**
+ * Sanitize a string for use as a filename on Windows, macOS, and Linux.
+ * - Removes control characters (0x00-0x1F, 0x7F) including tab, newline, etc.
+ * - Replaces characters forbidden by Windows: < > : " / \ | ? *
+ * - Replaces full-width variants commonly found in CJK text that may cause issues
+ * - Strips trailing dots and spaces (Windows rejects these)
+ * - Falls back to "untitled" if the result is empty or a Windows reserved name
+ */
+function sanitizeFilename(name: string): string {
+  let safe = name
+    // Remove control characters (tab, newline, etc.)
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\x00-\x1f\x7f]/g, "")
+    // Replace characters invalid on Windows (and problematic elsewhere)
+    .replace(/[<>:"/\\|?*]/g, "_")
+    // Collapse multiple underscores / spaces
+    .replace(/_{2,}/g, "_")
+    // Trim leading/trailing whitespace, dots, and underscores
+    .replace(/^[\s._]+|[\s._]+$/g, "");
+
+  // Guard against Windows reserved device names (CON, PRN, AUX, NUL, COM1-9, LPT1-9)
+  if (/^(CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(safe)) {
+    safe = `_${safe}`;
+  }
+
+  return safe || "untitled";
 }
 
 function formatDate(d: Date): string {
