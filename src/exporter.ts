@@ -278,9 +278,26 @@ export function exportToMarkdown(
       "---",
     ].join("\n");
 
-    // Append image references to the body
+    // Replace U+FFFC (Object Replacement Character) with image references,
+    // then append any remaining images at the end
     let bodyWithImages = note.body;
-    for (const image of note.images) {
+    const imageQueue = [...note.images];
+
+    // Replace each U+FFFC with the next available image
+    bodyWithImages = bodyWithImages.replace(/\uFFFC/g, () => {
+      const image = imageQueue.shift();
+      if (image) {
+        pendingImages.push({
+          url: image.url,
+          filepath: join(imagesDir, image.filename),
+        });
+        return `\n\n![image](./images/${image.filename})\n`;
+      }
+      return ""; // Remove U+FFFC if no image available
+    });
+
+    // Append any remaining images that weren't matched to U+FFFC
+    for (const image of imageQueue) {
       bodyWithImages += `\n\n![image](./images/${image.filename})`;
       pendingImages.push({
         url: image.url,
