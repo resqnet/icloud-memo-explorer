@@ -125,7 +125,7 @@ program
 program
   .command("view")
   .description("Browse exported Markdown notes in the browser")
-  .argument("<directory>", "Directory containing .md notes")
+  .argument("[directory]", "Directory containing .md notes", DEFAULT_OUTPUT)
   .option("-p, --port <number>", "Port number", "3000")
   .option("--no-open", "Don't auto-open browser")
   .action(async (directory, options) => {
