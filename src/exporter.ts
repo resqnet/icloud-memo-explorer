@@ -5,7 +5,7 @@
 import { mkdirSync, existsSync, writeFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { decodeNoteContent } from "./decoder.js";
+import { decodeNoteContent, decodeNoteBodyAsMarkdown } from "./decoder.js";
 import type { CloudKitRecord, Note, NoteImage } from "./types.js";
 
 /** Image download descriptor returned by exportToMarkdown. */
@@ -168,12 +168,12 @@ export function recordsToNotes(records: CloudKitRecord[]): Note[] {
       }
     }
 
-    // Body
+    // Body (with Markdown formatting from attribute runs)
     let body = "";
     const textField = fields.TextDataEncrypted?.value as string | undefined;
     if (textField) {
       try {
-        body = decodeNoteContent(textField).trim();
+        body = decodeNoteBodyAsMarkdown(textField).trim();
       } catch {
         // skip
       }
@@ -183,7 +183,7 @@ export function recordsToNotes(records: CloudKitRecord[]): Note[] {
       const snippetField = fields.SnippetEncrypted?.value as string | undefined;
       if (snippetField) {
         try {
-          body = decodeNoteContent(snippetField).trim();
+          body = decodeNoteBodyAsMarkdown(snippetField).trim();
         } catch {
           // skip
         }
